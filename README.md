@@ -19,7 +19,7 @@ The goal of this phase is to establish the foundation of the real-time data pipe
 
 ---
 
-## 🛠️ Technologies Used
+## Technologies Used
 
 | Component              | Tool / Version                        |
 |------------------------|----------------------------------------|
@@ -66,7 +66,7 @@ docker-compose up -d
 
 ---
 
-### ✅ Kafka Topic Creation
+### Kafka Topic Creation
 
 A topic called `stock_prices` was created for streaming stock trade messages:
 
@@ -130,10 +130,9 @@ while True:
 
 **Output:**
 
-```
+
 ![image](https://github.com/user-attachments/assets/9a5f7e8b-42b1-499e-a8f0-5cf5c0b8effb)
 
-```
 
 ---
 
