@@ -1,17 +1,14 @@
----
 
-````markdown
-# 📄 Project Report – Week 1: Kafka Setup & Stock Data Ingestion
+# Project Report – Week 1: Kafka Setup & Stock Data Ingestion
 
-## 📌 Project Title:
 **Real-Time Stock Volatility Insight Pipeline with Contextual Enrichment**
 
-## 🗓️ Week 1 Focus:
+## Week 1 Focus:
 Set up Kafka and simulate streaming stock trade data into a Kafka topic.
 
 ---
 
-## 🎯 Objective
+## Objective
 
 The goal of this phase is to establish the foundation of the real-time data pipeline by:
 
@@ -34,9 +31,9 @@ The goal of this phase is to establish the foundation of the real-time data pipe
 
 ---
 
-## 🧩 Kafka Setup Details
+## Kafka Setup Details
 
-### ✅ Docker Compose Configuration
+### Docker Compose Configuration
 
 Kafka and Zookeeper were deployed locally using Docker Compose to simplify setup and isolate dependencies.
 
@@ -55,7 +52,10 @@ services:
     ports:
       - "9092:9092"
     environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
 ````
 
 Kafka was started using:
@@ -84,7 +84,7 @@ Created topic stock_prices.
 
 ---
 
-## 🐍 Python Producer Script
+## Python Producer Script
 
 A Python script (`producer.py`) was created to send simulated stock trade messages into the `stock_prices` topic on Kafka.
 
@@ -94,27 +94,50 @@ A Python script (`producer.py`) was created to send simulated stock trade messag
 * Randomly generates stock symbols, prices, and volumes
 * Sends JSON-encoded messages using `kafka-python`
 
-**Sample Code:**
+**Code:**
 
 ```python
-message = {
-    'timestamp': datetime.utcnow().isoformat(),
-    'symbol': random.choice(['AAPL', 'TSLA', 'GOOGL', 'AMZN']),
-    'price': round(random.uniform(100, 500), 2),
-    'volume': random.randint(10, 1000)
-}
-producer.send('stock_prices', value=message)
+from kafka import KafkaProducer
+import json
+import time
+import random
+from datetime import datetime
+
+# Set up Kafka producer
+producer = KafkaProducer(
+    bootstrap_servers='localhost:9092',
+    value_serializer=lambda v: json.dumps(v).encode('utf-8')
+)
+
+# Simulate some stock symbols
+symbols = ['AAPL', 'TSLA', 'GOOGL', 'AMZN']
+
+while True:
+    # Create a fake stock message
+    message = {
+        'timestamp': datetime.utcnow().isoformat(),
+        'symbol': random.choice(symbols),
+        'price': round(random.uniform(100, 500), 2),
+        'volume': random.randint(10, 500)
+    }
+
+    print(f"Sending: {message}")
+    # Send message to Kafka topic
+    producer.send('stock_prices', value=message)
+    time.sleep(1)  # Wait 1 second before sending the next message
+
 ```
 
-**Sample Output:**
+**Output:**
 
 ```
-Sending: {'timestamp': '2025-07-07T00:34:12Z', 'symbol': 'AAPL', 'price': 245.12, 'volume': 320}
+![image](https://github.com/user-attachments/assets/9a5f7e8b-42b1-499e-a8f0-5cf5c0b8effb)
+
 ```
 
 ---
 
-## 🔄 Example Kafka Message
+## Example Kafka Message
 
 ```json
 {
@@ -124,10 +147,11 @@ Sending: {'timestamp': '2025-07-07T00:34:12Z', 'symbol': 'AAPL', 'price': 245.12
   "volume": 420
 }
 ```
+![image](https://github.com/user-attachments/assets/563131c5-0614-4358-bc11-67334225f2eb)
 
 ---
 
-## ✅ Week 1 Achievements
+## Week 1 Achievements
 
 * [x] Installed Docker and Docker Compose
 * [x] Successfully ran Kafka and Zookeeper containers
@@ -137,7 +161,7 @@ Sending: {'timestamp': '2025-07-07T00:34:12Z', 'symbol': 'AAPL', 'price': 245.12
 
 ---
 
-## 🔜 Next Steps (Week 2 Preview)
+## Next Steps (Week 2 Preview)
 
 * Consume messages from Kafka using PySpark
 * Enrich messages with weather data from OpenWeatherMap API
